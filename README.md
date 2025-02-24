@@ -1,5 +1,5 @@
-# Extrator de Leads Google Maps
-Essa é uma automação simples e muito intuítiva que tem como principal objetivo buscar por um termo no Google Maps e baixar os resultados para CSV, além de pegar os resultados esse script também faz uma verificação do site do lead (quando houver) se o site tem domínio próprio, se carrega rápido, se tem SSL, As tecnologias utilizadas, e também fará uma busca por links de WhatsApp ou Instagram na página.
+# Extrator Google Maps
+Essa é uma automação simples e muito intuítiva que tem como principal objetivo buscar por um termo no Google Maps e baixar os resultados para CSV, além de pegar os resultados esse script também faz uma verificação do site do estabelecimento (quando houver) se o site tem domínio próprio, se carrega rápido, se tem SSL, As tecnologias utilizadas, e também fará uma busca por links de WhatsApp ou Instagram na página.
 
 ## Instalação
 Instale as depêndencias do projeto
