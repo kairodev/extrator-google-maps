@@ -16,9 +16,29 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException, TimeoutException, NoSuchElementException, StaleElementReferenceException
-from webdriver_manager.chrome import ChromeDriverManager  
+from webdriver_manager.chrome import ChromeDriverManager
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 warnings.filterwarnings("ignore")
+
+def enviar_email(destinatario, remetente, senha, assunto, corpo):
+    msg = MIMEMultipart()
+    msg['From'] = remetente
+    msg['To'] = destinatario
+    msg['Subject'] = assunto
+
+    msg.attach(MIMEText(corpo, 'plain'))
+
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as servidor:
+            servidor.starttls()  # Ativa a segurança
+            servidor.login(remetente, senha)
+            servidor.send_message(msg)
+            print("E-mail enviado com sucesso!")
+    except Exception as e:
+        print(f"Erro ao enviar e-mail: {str(e)}")
 
 def verificar_site(url, verificar_completo=False):
     if not url or url == "Não obtido":
@@ -324,31 +344,33 @@ def scrape_google_maps(search_query, max_results=5, strict_filter=True, max_tabs
     print(f"\nBusca concluída! {len(locais)} resultados salvos em {filename}")
 
 def main():
-    os.system('cls' if os.name == 'nt' else 'clear')
-    print("Extrator de leads do Google Maps")
-    print("Desenvolvido por: Kairo T.")
-    print("Repositório Oficial: https://github.com")
-    search_query = input("Digite o termo de busca (ex: Advocacia Porto Alegre RS): ").strip()
-    if not search_query:
-        print("Erro: Termo de busca não pode ser vazio.")
+    # Solicita ao usuário o termo de busca
+    search_query = input("Por favor, insira o termo de busca: ").strip()
+
+    max_results = int(input("Quantos resultados você deseja (padrão é 5)? ") or 5)
+    strict_filter = input("Você deseja filtrar resultados sem telefone ou site? (s/n): ").strip().lower() == 's'
+    verificar_sites = input("Deseja verificar os sites encontrados? (s/n): ").strip().lower() == 's'
+
+    if max_results < 1 or max_results > 1000:
+        print("Erro: O limite deve ser entre 1 e 1000.")
         return
-
-    try:
-        max_results = int(input("Máximo de resultados (1-1000): ").strip())
-        if max_results < 1 or max_results > 1000:
-            print("Erro: O limite deve ser entre 1 e 1000.")
-            return
-    except ValueError:
-        print("Erro: Insira um número válido.")
-        return
-
-    strict_filter = input("Buscar apenas resultados que possuem telefone ou site? (s/n): ").strip().lower() == 's'
-    verificar_sites = input("Verificar sites (análise completa)? (s/n): ").strip().lower() == 's'
-
-    os.system('cls' if os.name == 'nt' else 'clear')
 
     print(f"Buscando: '{search_query}' | Limite: {max_results} resultados...")
+    
+    # Coleta dos dados
     scrape_google_maps(search_query, max_results=max_results, strict_filter=strict_filter, verificar_sites=verificar_sites)
 
+    # Pergunta se o usuário deseja receber os resultados por e-mail
+    enviar_por_email = input("Você gostaria de receber os resultados por e-mail? (s/n): ").strip().lower()
+    if enviar_por_email == 's':
+        destinatario = input("Por favor, insira seu e-mail: ").strip()
+        remetente = input("Por favor, insira seu e-mail (remetente): ").strip()
+        senha = input("Por favor, insira sua senha: ").strip()
+
+        # Formate os resultados, aqui é um exemplo simples
+        resultado_em_string = "Aqui estão os resultados da pesquisa..."  # Substitua pelos resultados formatados
+
+        enviar_email(destinatario, remetente, senha, "Resultados da Pesquisa", resultado_em_string)
+
 if __name__ == "__main__":
-    main()
+    main()  # Chama a função principal ao executar o script

@@ -3,4 +3,4 @@ requests
 bs4
 selenium
 webdriver_manager
-ssl
+
